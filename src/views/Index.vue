@@ -212,6 +212,7 @@ const showListCountry = ref(false);
 const showListCity = ref(false);
 const urlCountry = "https://wft-geo-db.p.rapidapi.com/v1/geo/countries?namePrefix=";
 const urlCity = "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=";
+const weatherDetails = ref('');
 
 const filteredCountries = computed(() => {
   return countries.filter((country) => !searchCountry.value || country.toLowerCase().includes(searchCountry.value.toLowerCase()));
@@ -225,7 +226,7 @@ function selectCountry(country) {
   searchCountry.value = country;
   showListCountry.value = false;
 
-  getCountry(urlCountry+country);
+  getCountry(urlCountry + country);
 }
 
 function selectCity(city) {
@@ -253,7 +254,7 @@ async function getCountry(url) {
             setTimeout(async () => {
               try {
                 country.value = res.data.data[0];
-                await getCities(urlCity+country.value.wikiDataId);
+                await getCities(urlCity + country.value.wikiDataId);
               } catch (error) {
                 console.error("Request failed:", error);
                 resolve(null);
@@ -261,7 +262,7 @@ async function getCountry(url) {
             }, 1500);
           });
         })
-        .catch(error =>{
+        .catch(error => {
           console.log("The error is : ", error);
         });
   } catch (error) {
@@ -290,7 +291,7 @@ async function getCities(url) {
           cities.push(res.data.data);
           console.log("showing cities : ", cities);
         })
-        .catch(error =>{
+        .catch(error => {
           console.log("The error is : ", error);
         });
   } catch (error) {
@@ -312,8 +313,8 @@ async function getWeatherDetails(lat, lon) {
   };
 
   try {
-    const response = await axios.request(options);
-    console.log(response.data);
+    weatherDetails.value = await axios.request(options);
+    console.log(weatherDetails.value.data.current.cloud);
   } catch (error) {
     console.error(error);
   }
@@ -321,14 +322,14 @@ async function getWeatherDetails(lat, lon) {
 </script>
 
 <template>
-  <div class="h-screen flex items-center justify-center bg-gray-100">
+  <div class="h-screen flex items-center justify-center bg-gray-400">
     <div
-      class="max-w-sm w-1/3 mx-auto p-8 bg-white rounded-xl shadow-2xl h-2/3"
+        class="max-w-sm w-1/3 mx-auto p-8 bg-white rounded-xl shadow-2xl h-2/3"
     >
       <img
-        class="h-24 mx-auto rounded-full ring-4 ring-green-500"
-        src="../assets/weather.svg"
-        alt="Weather"
+          class="h-24 mx-auto rounded-full ring-4 ring-green-500"
+          src="../assets/weather.svg"
+          alt="Weather"
       />
 
       <div class="text-center mt-8">
@@ -346,8 +347,10 @@ async function getWeatherDetails(lat, lon) {
               v-model="searchCountry"
               @focus="showListCountry = true"
           />
-          <div v-show="searchCountry.length > 0 && showListCountry" class="absolute left-0 mt-2 w-60 bg-white rounded-lg">
-            <ul class="px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
+          <div v-show="searchCountry.length > 0 && showListCountry"
+               class="absolute left-0 mt-2 w-60 bg-white rounded-lg">
+            <ul class="px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
+                aria-labelledby="dropdownSearchButton">
               <li v-for="country in filteredCountries" :key="country">
                 <div class="flex items-center pl-2 rounded hover:bg-gray-100">
                   <input
@@ -355,7 +358,7 @@ async function getWeatherDetails(lat, lon) {
                       id="checkbox-item-11"
                       readonly
                       :value="country"
-                      class="w-full py-2 ml-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300 cursor-pointer"
+                      class="w-full py-2 ml-2 text-sm font-medium text-black rounded dark:text-gray-300 cursor-pointer"
                   />
                 </div>
               </li>
@@ -376,7 +379,8 @@ async function getWeatherDetails(lat, lon) {
           />
 
           <div v-show="searchCity.length > 0 && showListCity" class="absolute left-0 mt-2 w-60 bg-white rounded-lg">
-            <ul class="px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">
+            <ul class="px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
+                aria-labelledby="dropdownSearchButton">
               <li v-for="city in filteredCities" :key="city">
                 <div class="flex items-center pl-2 rounded hover:bg-gray-100">
                   <input
@@ -393,31 +397,20 @@ async function getWeatherDetails(lat, lon) {
         </div>
       </div>
 
-<!--      <div class="z-10 bg-white rounded-lg shadow w-60 dark:bg-gray-700">-->
-<!--        <div class="p-3">-->
-<!--          <label for="input-group-search" class="sr-only">Search</label>-->
-<!--          <div class="relative">-->
-<!--            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">-->
-<!--              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">-->
-<!--                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>-->
-<!--              </svg>-->
-<!--            </div>-->
-<!--            <input type="text" id="input-group-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Country" v-model="search" >-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <ul v-if="search.length > 0" class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownSearchButton">-->
-<!--          <li v-for="country in filteredCountry" :key="country">-->
-<!--            <div class="flex items-center pl-2 rounded hover:bg-gray-100">-->
-<!--              <input @click="selectCountry(country)" id="checkbox-item-11" readonly :value="country" class="w-full py-2 ml-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300 bg-gray-6=700 cursor-pointer">-->
-<!--            </div>-->
-<!--          </li>-->
-<!--        </ul>-->
-<!--      </div>-->
-
-
-      <!-- <div>
+      <div class="mt-8">
         <p class="text-2xl text-black font-bold text-center mt-2">Weather Details</p>
-      </div> -->
+        <hr>
+
+        <ul v-if="weatherDetails">
+          <div>
+            <img :src="weatherDetails.data.current.condition.icon" alt="Weather Icon" />
+          </div>
+          <li class="text-black">
+
+          </li>
+        </ul>
+
+      </div>
     </div>
   </div>
 </template>
