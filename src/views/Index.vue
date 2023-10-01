@@ -369,7 +369,7 @@ function getMoreCities(){
     <div
         class="max-w-sm w-1/3 mx-auto p-8 bg-white rounded-xl shadow-2xl h-5/6"
     >
-      <h3 class="text-center text-2xl mb-2 bg-emerald-400 rounded-full p-2 text-white">Weather App</h3>
+      <h3 class="text-center text-2xl mb-2 bg-green-400 rounded-full p-2 text-white">Weather App</h3>
       <img
           class="h-24 mx-auto rounded-full ring-4 ring-green-500"
           src="../assets/weather.svg"

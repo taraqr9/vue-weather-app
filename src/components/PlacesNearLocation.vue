@@ -5,7 +5,7 @@ defineProps(['placesNearLocation'])
 <template>
   <div>
     <div class="px-4 sm:px-0 flex justify-center">
-      <h3 class="text-base font-semibold leading-7 text-gray-900">Places Near By</h3>
+      <h3 class="text-base font-semibold leading-7 text-gray-900 border-2 border-b-green-400 w-48 text-center hover:bg-green-400 cursor-pointer hover:text-white rounded-2xl p-2 shadow-lg">Places Near By</h3>
     </div>
     <div class="mt-4 h-80  border-2 rounded-xl p-4">
       <dl class="divide-y divide-gray-100">

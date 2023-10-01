@@ -4,11 +4,11 @@ defineProps(['weatherDetails'])
 
 <template>
   <div class="px-4 sm:px-0 flex justify-center">
-    <h3 class="text-base font-semibold leading-7 text-gray-900">Weather Details</h3>
+    <h3 class="text-base font-semibold leading-7 text-gray-900 border-2 border-b-green-400 w-48 text-center hover:bg-green-400 cursor-pointer hover:text-white rounded-2xl p-2 shadow-lg">Weather Details</h3>
   </div>
   <div class="mt-4 h-80 border-2 rounded-xl p-4">
     <div class="flex items-center justify-center">
-      <img :src="weatherDetails.data.current.condition.icon" alt="weather"/>
+      <img class="shadow-lg ring-1 ring-inset ring-gray-300 hover:bg-gray-50 rounded-2xl" :src="weatherDetails.data.current.condition.icon" alt="weather"/>
     </div>
     <dl class="divide-y divide-gray-100">
       <div class="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
