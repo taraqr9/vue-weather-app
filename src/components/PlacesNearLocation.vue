@@ -13,7 +13,7 @@ defineProps(['placesNearLocation'])
         <div class="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0" v-for="place in placesNearLocation.data.data"
              :key="place">
           <ul>
-            <li class="mt-1 w-40 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <li class="mt-1 w-36 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
               {{ place.name }}
             </li>
           </ul>
