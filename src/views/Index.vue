@@ -1,9 +1,11 @@
 <script setup>
 import {computed, ref} from "vue";
 import axios from 'axios';
+import WeatherDetails from '../components/WeatherDetails.vue';
+import PlacesNearLocation from '../components/PlacesNearLocation.vue';
 
 const country = ref('');
-const cityName = ref('');
+const cityDetails = ref('');
 const searchCountry = ref('');
 const searchCity = ref('');
 const cities = ref();
@@ -210,9 +212,12 @@ const countries = [
 ];
 const showListCountry = ref(false);
 const urlCountry = "https://wft-geo-db.p.rapidapi.com/v1/geo/countries?namePrefix=";
-const urlCity = "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=";
 const weatherDetails = ref('');
+const placesNearLocation = ref('');
 const isDropDownOpen = ref(false);
+const toggledWeatherOrPlaceNear = ref(true);
+const offset = ref(0);
+const countryId = ref(0);
 
 const filteredCountries = computed(() => {
   return countries.filter((country) => !searchCountry.value || country.toLowerCase().includes(searchCountry.value.toLowerCase()));
@@ -227,16 +232,20 @@ function selectCountry(country) {
 
 function selectCity(city) {
   searchCity.value = city.name;
-  cityName.value = city.name;
+  cityDetails.value = city;
 
   toggledDropDown();
   getWeatherDetails(city.latitude.toFixed(2), city.longitude.toFixed(2));
+  getPlacesNearLocation(city);
 }
 
 async function getCountry(url) {
   const options = {
     method: 'GET',
     url: url,
+    params: {
+      limit: '10',
+    },
     headers: {
       'X-RapidAPI-Key': 'b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54',
       'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
@@ -251,7 +260,8 @@ async function getCountry(url) {
             setTimeout(async () => {
               try {
                 country.value = res.data.data[0];
-                await getCities(urlCity + country.value.wikiDataId);
+                countryId.value = country.value.wikiDataId;
+                await getCities();
               } catch (error) {
                 console.error("Request failed:", error);
                 resolve(null);
@@ -268,13 +278,13 @@ async function getCountry(url) {
 
 }
 
-async function getCities(url) {
+async function getCities() {
   const options = {
     method: 'GET',
-    url: url,
+    url: "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds="+countryId.value,
     params: {
       limit: '10',
-      offset: '10'
+      offset: offset.value
     },
     headers: {
       'X-RapidAPI-Key': 'b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54',
@@ -313,16 +323,43 @@ async function getWeatherDetails(lat, lon) {
   }
 }
 
+async function getPlacesNearLocation(city) {
+  const options = {
+    method: 'GET',
+    url: `https://wft-geo-db.p.rapidapi.com/v1/geo/cities/${city.wikiDataId}/nearbyCities`,
+    params: {radius: '100'},
+    headers: {
+      'X-RapidAPI-Key': 'b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54',
+      'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
+    }
+  };
+
+  try {
+    placesNearLocation.value = await axios.request(options);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 function toggledDropDown() {
   isDropDownOpen.value = !isDropDownOpen.value;
 }
 
+function toggledWeatherOrPlaceNearLocation(value) {
+  toggledWeatherOrPlaceNear.value = value;
+}
+
 function clearValues() {
   showListCountry.value = false;
-  cityName.value = '';
+  cityDetails.value = '';
   isDropDownOpen.value = false;
   weatherDetails.value = '';
   cities.value = '';
+}
+
+function getMoreCities(){
+  offset.value += 10;
+  getCities();
 }
 </script>
 
@@ -376,7 +413,7 @@ function clearValues() {
             <button @click="toggledDropDown" type="button"
                     class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     id="menu-button" aria-expanded="true" aria-haspopup="true">
-              {{ cityName ? cityName : "Select City" }}
+              {{ cityDetails ? cityDetails.name : "Select City" }}
               <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd"
                       d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
@@ -387,62 +424,46 @@ function clearValues() {
 
           <div v-if="isDropDownOpen"
                class="mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-               role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+               role="menu" aria-orientation="vertical" aria-labelledby="menu-button">
             <div class="py-1" role="none">
               <li v-for="city in cities" :key="city" @click="selectCity(city)"
                   class="text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-sky-100 rounded-2xl"
-                  role="menuitem" tabindex="-1" id="menu-item-0">
+                  role="menuitem" id="menu-item-0">
                 {{ city.name }}
               </li>
+              <li @click="getMoreCities"
+                  class="text-blue-700 block bg-sky-100 px-4 py-2 text-sm cursor-pointer hover:bg-sky-200 rounded-2xl"
+                  role="menuitem" id="menu-item-0">
+                More
+              </li>
+
             </div>
           </div>
         </div>
       </div>
 
-      <div v-if="weatherDetails" class="mt-8">
-        <div>
-          <div class="px-4 sm:px-0 flex justify-center">
-            <h3 class="text-base font-semibold leading-7 text-gray-900">Weather Details</h3>
-          </div>
-          <div class="mt-4 border-2 rounded-xl p-4">
-            <div class="flex items-center justify-center">
-              <img :src="weatherDetails.data.current.condition.icon" alt="weather"/>
-            </div>
-            <dl class="divide-y divide-gray-100">
-              <div class="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">Condition</dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {{ weatherDetails.data.current.condition.text }}
-                </dd>
-              </div>
-              <div class="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">Temperature</dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {{ weatherDetails.data.current.temp_c }}
-                </dd>
-              </div>
-              <div class="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">Day/Night</dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {{ weatherDetails.data.current.is_day === 1 ? "Day" : "Night" }}
-                </dd>
-              </div>
-              <div class="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">Cloud</dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {{ weatherDetails.data.current.cloud }}
-                </dd>
-              </div>
-              <div class="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-medium leading-6 text-gray-900">Feels-like</dt>
-                <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {{ weatherDetails.data.current.feelslike_c }}
-                </dd>
-              </div>
-            </dl>
-          </div>
+      <div v-if="weatherDetails" class="relative mt-4">
+        <div class="flex items-center justify-between">
+          <button @click="toggledWeatherOrPlaceNearLocation(true)"
+                  class="border-4 m-2 w-full hover:bg-green-500 hover:text-white p-2 border-green-500 rounded-full">
+            Weather Details
+          </button>
+          <button @click="toggledWeatherOrPlaceNearLocation(false)"
+                  class="border-4 m-2 w-full hover:bg-green-500 hover:text-white p-2 border-green-500 rounded-full">
+            Places Near
+          </button>
         </div>
 
+        <div v-if="toggledWeatherOrPlaceNear">
+          <WeatherDetails
+              :weatherDetails="weatherDetails"
+          />
+        </div>
+        <div v-if="!toggledWeatherOrPlaceNear">
+          <PlacesNearLocation
+              :placesNearLocation="placesNearLocation"
+          />
+        </div>
 
       </div>
     </div>
