@@ -1,14 +1,18 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import axios from 'axios';
 import WeatherDetails from '../components/WeatherDetails.vue';
 import PlacesNearLocation from '../components/PlacesNearLocation.vue';
+import LoadingAnimation from '../components/LoadingAnimation.vue';
 
 const country = ref('');
 const cityDetails = ref('');
+const regionDetails = ref('');
 const searchCountry = ref('');
+const searchRegion = ref('');
 const searchCity = ref('');
 const cities = ref();
+const regions = ref();
 const countries = [
   "Afghanistan",
   "Albania",
@@ -247,6 +251,48 @@ function selectCity(city) {
   }, 2000);
 }
 
+async function getRegions() {
+  const options = {
+    method: 'GET',
+    url: `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${countryId.value}/regions`,
+    params: {
+      limit: '10',
+    },
+    headers: {
+      'X-RapidAPI-Key': 'b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54',
+      'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
+    }
+  };
+
+  try {
+    await axios.request(options)
+        .then(async (res) => {
+          regions.value = res.data.data;
+          console.log(regions);
+        })
+        .catch(error => {
+          console.log("The error is : ", error);
+        });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function selectRegion(region) {
+  loadingIconForDetailsAndPlaces.value = true;
+  searchRegion.value = region.name;
+  regionDetails.value = region;
+
+  toggledDropDown();
+  console.log(regionDetails);
+
+  setTimeout(() => {
+    getCities();
+
+    loadingIconForDetailsAndPlaces.value = false;
+  }, 2000);
+}
+
 async function getCountry(url) {
   const options = {
     method: 'GET',
@@ -262,6 +308,7 @@ async function getCountry(url) {
 
   try {
     loadingIconForCity.value = true;
+
     await axios.request(options)
         .then(async (res) => {
           country.value = res.data.data[0];
@@ -271,6 +318,7 @@ async function getCountry(url) {
                 country.value = res.data.data[0];
                 countryId.value = country.value.wikiDataId;
 
+                await getRegions();
                 await getCities();
 
                 loadingIconForCity.value = false;
@@ -368,12 +416,18 @@ function clearValues() {
   isDropDownOpen.value = false;
   weatherDetails.value = '';
   cities.value = '';
+  regions.value = '';
+  regionDetails.value = '';
 }
 
 function getMoreCities() {
   offset.value += 10;
   getCities();
 }
+
+onMounted(() => {
+  getRegions();
+})
 </script>
 
 <template>
@@ -424,26 +478,35 @@ function getMoreCities() {
       </div>
 
       <div v-if="loadingIconForCity">
+        <LoadingAnimation/>
+      </div>
+
+      <div>
         <div class="relative mt-10">
           <div>
-            <button type="button"
-                    class="w-full gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            <button @click="toggledDropDown" type="button"
+                    class="inline-flex w-full p-2 pl-10 gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     id="menu-button" aria-expanded="true" aria-haspopup="true">
-
-              <div role="status" class="flex">
-                <svg aria-hidden="true" class="w-5 h-5 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                      fill="currentColor"/>
-                  <path
-                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                      fill="currentFill"/>
-                </svg>
-                Loading...
-              </div>
-
+              {{ regionDetails ? regionDetails.name : "Select Regions" }}
+              <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd"
+                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                      clip-rule="evenodd"/>
+              </svg>
             </button>
+          </div>
+
+          <div v-if="isDropDownOpen"
+               class="mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+               role="menu" aria-orientation="vertical" aria-labelledby="menu-button">
+            <div class="py-1" role="none">
+              <li v-for="region in regions" :key="region" @click="selectRegion(region)"
+                  class="text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-sky-100 rounded-2xl"
+                  role="menuitem" id="menu-item-0">
+                {{ region.name }}
+              </li>
+
+            </div>
           </div>
         </div>
       </div>
@@ -485,16 +548,7 @@ function getMoreCities() {
 
       <div v-if="loadingIconForDetailsAndPlaces">
         <div role="status" class="h-96 flex items-center justify-center">
-          <svg aria-hidden="true" class="w-5 h-5 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-               viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                fill="currentColor"/>
-            <path
-                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                fill="currentFill"/>
-          </svg>
-          Loading...
+          <LoadingAnimation/>
         </div>
       </div>
 
