@@ -3,6 +3,7 @@ import {computed, ref} from "vue";
 import axios from 'axios';
 import WeatherDetails from '../components/WeatherDetails.vue';
 import PlacesNearLocation from '../components/PlacesNearLocation.vue';
+import BtnTest from '../components/ButtonTest.vue';
 
 const country = ref('');
 const cityDetails = ref('');
@@ -365,9 +366,10 @@ function getMoreCities(){
 
 <template>
   <title>Weather App</title>
+  <h1 v-if="loadingIcon">Hello</h1>
   <div class="h-screen flex items-center justify-center bg-gray-400">
     <div
-        class="max-w-sm w-1/3 mx-auto p-8 bg-white rounded-xl shadow-2xl h-5/6"
+        class="max-w-sm w-1/3 mx-auto p-8 bg-white rounded-xl shadow-2xl h-full"
     >
       <h3 class="text-center text-2xl mb-2 bg-green-400 rounded-full p-2 text-white">Weather App</h3>
       <img
@@ -424,34 +426,34 @@ function getMoreCities(){
             </button>
           </div>
 
-          <div v-if="isDropDownOpen"
-               class="mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-               role="menu" aria-orientation="vertical" aria-labelledby="menu-button">
-            <div class="py-1" role="none">
-              <li v-for="city in cities" :key="city" @click="selectCity(city)"
-                  class="text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-sky-100 rounded-2xl"
-                  role="menuitem" id="menu-item-0">
-                {{ city.name }}
-              </li>
-              <li @click="getMoreCities"
-                  class="text-blue-700 block bg-sky-100 px-4 py-2 text-sm cursor-pointer hover:bg-sky-200 rounded-2xl"
-                  role="menuitem" id="menu-item-0">
-                More
-              </li>
+                    <div v-if="isDropDownOpen"
+                         class="mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                         role="menu" aria-orientation="vertical" aria-labelledby="menu-button">
+                      <div class="py-1" role="none">
+                        <li v-for="city in cities" :key="city" @click="selectCity(city)"
+                            class="text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-sky-100 rounded-2xl"
+                            role="menuitem" id="menu-item-0">
+                          {{ city.name }}
+                        </li>
+                        <li @click="getMoreCities"
+                            class="text-blue-700 block bg-sky-100 px-4 py-2 text-sm cursor-pointer hover:bg-sky-200 rounded-2xl"
+                            role="menuitem" id="menu-item-0">
+                          More
+                        </li>
 
-            </div>
-          </div>
-        </div>
-      </div>
+                      </div>
+                    </div>
+                  </div>
+
 
       <div v-if="weatherDetails" class="relative mt-4">
         <div class="flex items-center justify-between">
           <button @click="toggledWeatherOrPlaceNearLocation(true)"
-                  class="border-4 m-2 w-full hover:bg-green-500 hover:text-white p-2 border-green-500 rounded-full">
+                  class="btn-green">
             Weather Details
           </button>
           <button @click="toggledWeatherOrPlaceNearLocation(false)"
-                  class="border-4 m-2 w-full hover:bg-green-500 hover:text-white p-2 border-green-500 rounded-full">
+                  class="btn-green">
             Places Near
           </button>
         </div>
