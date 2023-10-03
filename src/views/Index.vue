@@ -477,7 +477,7 @@ function clearValuesForWeather() {
               @focus="showListCountry = true"
           />
           <div v-show="searchCountry.length > 0 && showListCountry"
-               class="absolute left-0 mt-2 w-60 bg-white rounded-lg">
+               class="absolute left-0 mt-2 w-60 rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
             <ul
                 aria-labelledby="dropdownSearchButton">
               <li class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
@@ -488,7 +488,7 @@ function clearValuesForWeather() {
                     id="checkbox-item-11"
                     readonly
                     :value="country"
-                    class="w-full py-2 text-sm font-medium hover:bg-sky-100  text-black cursor-pointer rounded-xl"
+                    class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
                 />
               </li>
             </ul>
@@ -516,8 +516,7 @@ function clearValuesForWeather() {
           </div>
 
           <ul v-if="isDropDownOpenForRegion"
-              class="mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-              role="menu" aria-orientation="vertical" aria-labelledby="menu-button">
+              class="absolute mt-2 w-60 origin-top-right rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40">
             <li v-for="region in regions" :key="region" @click="selectRegion(region)"
                 class="text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-sky-100 rounded-2xl"
                 role="menuitem" id="menu-item-0">
@@ -544,7 +543,7 @@ function clearValuesForWeather() {
           />
           <div
               v-show="searchCity && showListCity"
-              class="absolute left-0 mt-2 w-60 bg-white rounded-lg"
+              class="absolute left-0 mt-2 w-60  rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-30"
           >
             <ul aria-labelledby="dropdownSearchButton">
               <li
