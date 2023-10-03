@@ -447,32 +447,30 @@ onMounted(() => {
       <div class="text-center mt-8">
       </div>
 
-      <div>
-        <div class="relative">
-          <input
-              type="text"
-              id="input-group-search"
-              class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Search Country"
-              v-model="searchCountry"
-              @focus="showListCountry = true"
-          />
-          <div v-show="searchCountry.length > 0 && showListCountry"
-               class="absolute left-0 mt-2 w-60 bg-white rounded-lg">
-            <ul
-                aria-labelledby="dropdownSearchButton">
-              <li class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl" v-for="country in filteredCountries"
-                  :key="country">
-                <input
-                    @click="selectCountry(country)"
-                    id="checkbox-item-11"
-                    readonly
-                    :value="country"
-                    class="w-full py-2 text-sm font-medium hover:bg-sky-100  text-black cursor-pointer rounded-xl"
-                />
-              </li>
-            </ul>
-          </div>
+      <div class="relative z-40">
+        <input
+            type="text"
+            id="input-group-search"
+            class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Search Country"
+            v-model="searchCountry"
+            @focus="showListCountry = true"
+        />
+        <div v-show="searchCountry.length > 0 && showListCountry"
+             class="absolute left-0 mt-2 w-60">
+          <ul
+              aria-labelledby="dropdownSearchButton">
+            <li class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl" v-for="country in filteredCountries"
+                :key="country">
+              <input
+                  @click="selectCountry(country)"
+                  id="checkbox-item-11"
+                  readonly
+                  :value="country"
+                  class="w-full py-2 text-sm font-medium hover:bg-sky-100  text-black cursor-pointer rounded-xl"
+              />
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -481,13 +479,13 @@ onMounted(() => {
       </div>
 
       <div>
-        <div class="relative mt-10">
+        <div class="relative mt-10 z-30">
           <div>
             <button @click="toggledDropDown" type="button"
                     class="inline-flex w-full p-2 pl-10 gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     id="menu-button" aria-expanded="true" aria-haspopup="true">
               {{ regionDetails ? regionDetails.name : "Select Regions" }}
-              <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <svg class="mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd"
                       d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
                       clip-rule="evenodd"/>
