@@ -432,7 +432,8 @@ async function getPlacesNearLocation(city) {
 
 function toggledDropDownForRegion() {
   isDropDownOpenForRegion.value = !isDropDownOpenForRegion.value;
-  isDropDownOpenForCities.value = false;
+  showListCity.value = false;
+  showListCountry.value = false;
 }
 
 function toggledWeatherOrPlaceNearLocation(value) {
@@ -458,6 +459,16 @@ function clearValuesForCities() {
 function clearValuesForWeather() {
   isDropDownOpenForCities.value = false;
   weatherDetails.value = "";
+}
+
+function countryDropDown(){
+  showListCountry.value = true;
+  showListCity.value = false;
+}
+
+function cityDropDown(){
+  showListCity.value = true;
+  showListCountry.value = false;
 }
 </script>
 
@@ -497,7 +508,7 @@ function clearValuesForWeather() {
           class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
           placeholder="Search Country"
           v-model="searchCountry"
-          @focus="showListCountry = true"
+          @click="countryDropDown"
         />
         <div
           v-show="searchCountry.length > 0 && showListCountry"
@@ -588,7 +599,7 @@ function clearValuesForWeather() {
             placeholder="Search City"
             v-model="searchCity"
             @input="onCitySearch"
-            @focus="showListCity = true"
+            @click="cityDropDown"
           />
           <div
             v-show="searchCity && showListCity"
