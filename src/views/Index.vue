@@ -1,16 +1,16 @@
 <script setup>
-import {computed, onMounted, ref} from "vue";
-import axios from 'axios';
-import WeatherDetails from '../components/WeatherDetails.vue';
-import PlacesNearLocation from '../components/PlacesNearLocation.vue';
-import LoadingAnimation from '../components/LoadingAnimation.vue';
+import { computed, onMounted, ref } from "vue";
+import axios from "axios";
+import WeatherDetails from "../components/WeatherDetails.vue";
+import PlacesNearLocation from "../components/PlacesNearLocation.vue";
+import LoadingAnimation from "../components/LoadingAnimation.vue";
 
-const country = ref('');
-const cityDetails = ref('');
-const regionDetails = ref('');
-const searchCountry = ref('');
-const searchRegion = ref('');
-const searchCity = ref('');
+const country = ref("");
+const cityDetails = ref("");
+const regionDetails = ref("");
+const searchCountry = ref("");
+const searchRegion = ref("");
+const searchCity = ref("");
 const cities = ref();
 const regions = ref();
 const countries = [
@@ -216,9 +216,10 @@ const countries = [
 ];
 const showListCountry = ref(false);
 const showListCity = ref(false);
-const urlCountry = "https://wft-geo-db.p.rapidapi.com/v1/geo/countries?namePrefix=";
-const weatherDetails = ref('');
-const placesNearLocation = ref('');
+const urlCountry =
+  "https://wft-geo-db.p.rapidapi.com/v1/geo/countries?namePrefix=";
+const weatherDetails = ref("");
+const placesNearLocation = ref("");
 const isDropDownOpenForRegion = ref(false);
 const isDropDownOpenForCities = ref(false);
 const toggledWeatherOrPlaceNear = ref(true);
@@ -229,7 +230,11 @@ const loadingIconForRegion = ref(false);
 const loadingIconForDetailsAndPlaces = ref(false);
 
 const filteredCountries = computed(() => {
-  const filteredCountries = countries.filter((country) => !searchCountry.value || country.toLowerCase().includes(searchCountry.value.toLowerCase()));
+  const filteredCountries = countries.filter(
+    (country) =>
+      !searchCountry.value ||
+      country.toLowerCase().includes(searchCountry.value.toLowerCase())
+  );
   if (filteredCountries.length === 0 && country.value) {
     clearValuesForRegion();
   }
@@ -255,25 +260,26 @@ function selectCountry(country) {
 
 async function getRegions() {
   const options = {
-    method: 'GET',
+    method: "GET",
     url: `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${countryId.value}/regions`,
     params: {
-      limit: '10',
+      limit: "10",
     },
     headers: {
-      'X-RapidAPI-Key': 'b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54',
-      'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
-    }
+      "X-RapidAPI-Key": "b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54",
+      "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
+    },
   };
 
   try {
-    await axios.request(options)
-        .then(async (res) => {
-          regions.value = res.data.data;
-        })
-        .catch(error => {
-          console.log("The error is : ", error);
-        });
+    await axios
+      .request(options)
+      .then(async (res) => {
+        regions.value = res.data.data;
+      })
+      .catch((error) => {
+        console.log("The error is : ", error);
+      });
   } catch (error) {
     console.error(error);
   }
@@ -298,62 +304,62 @@ function selectRegion(region) {
 
 async function getCountry(url) {
   const options = {
-    method: 'GET',
+    method: "GET",
     url: url,
     params: {
-      limit: '10',
+      limit: "10",
     },
     headers: {
-      'X-RapidAPI-Key': 'b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54',
-      'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
-    }
+      "X-RapidAPI-Key": "b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54",
+      "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
+    },
   };
 
   try {
     loadingIconForRegion.value = true;
 
-    await axios.request(options)
-        .then(async (res) => {
-          country.value = res.data.data[0];
-          return new Promise((resolve) => {
-            setTimeout(async () => {
-              try {
-                country.value = res.data.data[0];
-                countryId.value = country.value.wikiDataId;
+    await axios
+      .request(options)
+      .then(async (res) => {
+        country.value = res.data.data[0];
+        return new Promise((resolve) => {
+          setTimeout(async () => {
+            try {
+              country.value = res.data.data[0];
+              countryId.value = country.value.wikiDataId;
 
-                await getRegions();
+              await getRegions();
 
-                loadingIconForRegion.value = false;
-              } catch (error) {
-                console.error("Request failed:", error);
-                resolve(null);
-              }
-            }, 1500);
-          });
-        })
-        .catch(error => {
-          console.log("The error is : ", error);
+              loadingIconForRegion.value = false;
+            } catch (error) {
+              console.error("Request failed:", error);
+              resolve(null);
+            }
+          }, 1500);
         });
+      })
+      .catch((error) => {
+        console.log("The error is : ", error);
+      });
     loadingIconForRegion.value = false;
   } catch (error) {
     console.error(error);
   }
-
 }
 
-async function getCities(city = '') {
+async function getCities(city = "") {
   const options = {
-    method: 'GET',
+    method: "GET",
     url: `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${regionDetails.value.countryCode}/regions/${regionDetails.value.isoCode}/cities`,
     params: {
-      namePrefix: city ? city : '',
-      limit: '10',
-      offset: offset.value
+      namePrefix: city ? city : "",
+      limit: "10",
+      offset: offset.value,
     },
     headers: {
-      'X-RapidAPI-Key': 'b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54',
-      'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
-    }
+      "X-RapidAPI-Key": "b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54",
+      "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
+    },
   };
 
   try {
@@ -367,11 +373,10 @@ async function getCities(city = '') {
         }, 1200);
       });
     } else {
-      cities.value[0] = {name: 'No match found!'};
+      cities.value[0] = { name: "No match found!" };
       cities.value = cities.value.slice(0, 1);
     }
-  } catch (error) {
-  }
+  } catch (error) {}
 }
 
 function selectCity(city) {
@@ -391,13 +396,13 @@ function selectCity(city) {
 
 async function getWeatherDetails(lat, lon) {
   const options = {
-    method: 'GET',
-    url: 'https://weatherapi-com.p.rapidapi.com/current.json',
-    params: {q: `${lat}, ${lon}`},
+    method: "GET",
+    url: "https://weatherapi-com.p.rapidapi.com/current.json",
+    params: { q: `${lat}, ${lon}` },
     headers: {
-      'X-RapidAPI-Key': 'b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54',
-      'X-RapidAPI-Host': 'weatherapi-com.p.rapidapi.com'
-    }
+      "X-RapidAPI-Key": "b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54",
+      "X-RapidAPI-Host": "weatherapi-com.p.rapidapi.com",
+    },
   };
 
   try {
@@ -409,13 +414,13 @@ async function getWeatherDetails(lat, lon) {
 
 async function getPlacesNearLocation(city) {
   const options = {
-    method: 'GET',
+    method: "GET",
     url: `https://wft-geo-db.p.rapidapi.com/v1/geo/cities/${city.wikiDataId}/nearbyCities`,
-    params: {radius: '100'},
+    params: { radius: "100" },
     headers: {
-      'X-RapidAPI-Key': 'b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54',
-      'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
-    }
+      "X-RapidAPI-Key": "b7acb9ad46msha339e369a978e13p19d9f0jsn19e09ecd0c54",
+      "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
+    },
   };
 
   try {
@@ -435,24 +440,24 @@ function toggledWeatherOrPlaceNearLocation(value) {
 }
 
 function clearValuesForRegion() {
-  cityDetails.value = '';
-  weatherDetails.value = '';
-  cities.value = '';
-  regions.value = '';
-  regionDetails.value = '';
+  cityDetails.value = "";
+  weatherDetails.value = "";
+  cities.value = "";
+  regions.value = "";
+  regionDetails.value = "";
 }
 
 function clearValuesForCities() {
   isDropDownOpenForCities.value = false;
-  weatherDetails.value = '';
-  cities.value = '';
-  regionDetails.value = '';
-  searchCity.value = '';
+  weatherDetails.value = "";
+  cities.value = "";
+  regionDetails.value = "";
+  searchCity.value = "";
 }
 
 function clearValuesForWeather() {
   isDropDownOpenForCities.value = false;
-  weatherDetails.value = '';
+  weatherDetails.value = "";
 }
 </script>
 
@@ -461,149 +466,176 @@ function clearValuesForWeather() {
 
   <div class="h-screen flex items-center justify-center bg-gray-400">
     <div
-        class="max-w-sm w-1/3 mx-auto p-8 bg-white rounded-xl shadow-2xl h-full"
+      class="max-w-sm w-1/3 mx-auto p-8 bg-white rounded-xl shadow-2xl h-full"
     >
-      <h3 class="text-center text-2xl mb-2 bg-green-400 rounded-full p-2 text-white">Weather App</h3>
+      <h3
+        class="text-center text-2xl mb-2 bg-green-400 rounded-full p-2 text-white"
+      >
+        Weather App
+      </h3>
       <img
-          class="h-24 mx-auto rounded-full ring-4 ring-green-500"
-          src="../assets/weather.svg"
-          alt="Weather"
+        class="h-24 mx-auto rounded-full ring-4 ring-green-500"
+        src="../assets/weather.svg"
+        alt="Weather"
       />
-      <div class="text-center mt-8">
+      <div class="text-center mt-8"></div>
+
+      <div
+        class="absolute inset-0 z-50"
+        v-if="
+          loadingIconForRegion ||
+          loadingIconForCity ||
+          loadingIconForDetailsAndPlaces
+        "
+      >
+        <LoadingAnimation />
       </div>
-
-      <div v-if="!loadingIconForRegion && !loadingIconForCity && !loadingIconForDetailsAndPlaces">
-        <div class="relative">
-          <input
-              type="text"
-              id="input-group-search"
-              class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Search Country"
-              v-model="searchCountry"
-              @focus="showListCountry = true"
-          />
-          <div v-show="searchCountry.length > 0 && showListCountry"
-               class="absolute left-0 mt-2 w-60 rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-            <ul
-                aria-labelledby="dropdownSearchButton">
-              <li v-show="searchCountry.length > 0 && showListCountry"
-                  class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
-                  v-for="country in filteredCountries"
-                  :key="country">
-                <input
-                    @click="selectCountry(country)"
-                    id="checkbox-item-11"
-                    readonly
-                    :value="country"
-                    class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
-                />
-              </li>
-
-              <li v-if="showListCountry && filteredCountries.length===0"
-                  class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl">
-                <input
-                    id="checkbox-item-11"
-                    readonly
-                    value="No match found!"
-                    class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
-                />
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div v-if="regions && regions.length>0">
-          <div class="relative mt-10">
-            <div>
-              <button @click="toggledDropDownForRegion" type="button"
-                      class="inline-flex w-full p-2 pl-10 gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                      id="menu-button" aria-expanded="true" aria-haspopup="true">
-                {{ regionDetails ? regionDetails.name : "Select Regions" }}
-                <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd"
-                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                        clip-rule="evenodd"/>
-                </svg>
-              </button>
-            </div>
-
-            <ul v-if="isDropDownOpenForRegion"
-                class="absolute mt-2 w-60 origin-top-right rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40">
-              <li v-for="region in regions" :key="region" @click="selectRegion(region)"
-                  class="text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-sky-100 rounded-2xl"
-                  role="menuitem" id="menu-item-0">
-                {{ region.name }}
-              </li>
-            </ul>
-          </div>
-        </div>
-
-
-        <div v-if="cities && cities.length > 0 && loadingIconForCity === false">
-          <div class="relative mt-10">
-            <input
-                type="text"
-                id="input-group-search"
-                class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Search City"
-                v-model="searchCity"
-                @input="onCitySearch"
-                @focus="showListCity = true"
-            />
-            <div
-                v-show="searchCity && showListCity"
-                class="absolute left-0 mt-2 w-60  rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-30"
+      <div class="relative z-40">
+        <input
+          type="text"
+          id="input-group-search"
+          class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Search Country"
+          v-model="searchCountry"
+          @focus="showListCountry = true"
+        />
+        <div
+          v-show="searchCountry.length > 0 && showListCountry"
+          class="absolute left-0 mt-2 w-60 rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+        >
+          <ul aria-labelledby="dropdownSearchButton">
+            <li
+              v-show="searchCountry.length > 0 && showListCountry"
+              class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
+              v-for="country in filteredCountries"
+              :key="country"
             >
-              <ul aria-labelledby="dropdownSearchButton">
-                <li
-                    class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
-                    v-for="city in filteredCities"
-                    :key="city"
-                >
-                  <input
-                      @click="selectCity(city)"
-                      id="checkbox-item-11"
-                      readonly
-                      :value="city.name"
-                      class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
-                  />
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+              <input
+                @click="selectCountry(country)"
+                id="checkbox-item-11"
+                readonly
+                :value="country"
+                class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
+              />
+            </li>
 
-        <div v-if="weatherDetails" class="relative mt-4">
-          <div class="flex items-center justify-between">
-            <button @click="toggledWeatherOrPlaceNearLocation(true)"
-                    class="btn-green">
-              Weather Details
-            </button>
-            <button @click="toggledWeatherOrPlaceNearLocation(false)"
-                    class="btn-green">
-              Places Near
-            </button>
-          </div>
-
-          <div v-if="toggledWeatherOrPlaceNear">
-            <WeatherDetails
-                :weatherDetails="weatherDetails"
-            />
-          </div>
-          <div v-if="!toggledWeatherOrPlaceNear">
-            <PlacesNearLocation
-                :placesNearLocation="placesNearLocation"
-            />
-          </div>
-
+            <li
+              v-if="showListCountry && filteredCountries.length === 0"
+              class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
+            >
+              <input
+                id="checkbox-item-11"
+                readonly
+                value="No match found!"
+                class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
+              />
+            </li>
+          </ul>
         </div>
       </div>
-      <div class="relative" v-if="loadingIconForRegion || loadingIconForCity || loadingIconForDetailsAndPlaces">
-        <LoadingAnimation/>
+
+      <div v-if="regions && regions.length > 0">
+        <div class="relative mt-10 z-30">
+          <div>
+            <button
+              @click="toggledDropDownForRegion"
+              type="button"
+              class="inline-flex w-full p-2 pl-10 gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              id="menu-button"
+              aria-expanded="true"
+              aria-haspopup="true"
+            >
+              {{ regionDetails ? regionDetails.name : "Select Regions" }}
+              <svg
+                class="-mr-1 h-5 w-5 text-gray-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <ul
+            v-if="isDropDownOpenForRegion"
+            class="absolute mt-2 w-60 origin-top-right rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          >
+            <li
+              v-for="region in regions"
+              :key="region"
+              @click="selectRegion(region)"
+              class="text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-sky-100 rounded-2xl"
+              role="menuitem"
+              id="menu-item-0"
+            >
+              {{ region.name }}
+            </li>
+          </ul>
+        </div>
       </div>
 
+      <div v-if="cities && cities.length > 0">
+        <div class="relative mt-10 z-20">
+          <input
+            type="text"
+            id="input-group-search"
+            class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Search City"
+            v-model="searchCity"
+            @input="onCitySearch"
+            @focus="showListCity = true"
+          />
+          <div
+            v-show="searchCity && showListCity"
+            class="absolute left-0 mt-2 w-60 rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          >
+            <ul aria-labelledby="dropdownSearchButton">
+              <li
+                class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
+                v-for="city in filteredCities"
+                :key="city"
+              >
+                <input
+                  @click="selectCity(city)"
+                  id="checkbox-item-11"
+                  readonly
+                  :value="city.name"
+                  class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
+                />
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="weatherDetails" class="relative mt-4">
+        <div class="flex items-center justify-between">
+          <button
+            @click="toggledWeatherOrPlaceNearLocation(true)"
+            class="btn-green"
+          >
+            Weather Details
+          </button>
+          <button
+            @click="toggledWeatherOrPlaceNearLocation(false)"
+            class="btn-green"
+          >
+            Places Near
+          </button>
+        </div>
+
+        <div v-if="toggledWeatherOrPlaceNear">
+          <WeatherDetails :weatherDetails="weatherDetails" />
+        </div>
+        <div v-if="!toggledWeatherOrPlaceNear">
+          <PlacesNearLocation :placesNearLocation="placesNearLocation" />
+        </div>
+      </div>
     </div>
-
-
   </div>
 </template>
