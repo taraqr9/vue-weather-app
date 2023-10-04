@@ -432,8 +432,8 @@ async function getPlacesNearLocation(city) {
 
 function toggledDropDownForRegion() {
   isDropDownOpenForRegion.value = !isDropDownOpenForRegion.value;
-  showListCity.value = false;
   showListCountry.value = false;
+  showListCity.value = false;
 }
 
 function toggledWeatherOrPlaceNearLocation(value) {
@@ -464,11 +464,13 @@ function clearValuesForWeather() {
 function countryDropDown(){
   showListCountry.value = true;
   showListCity.value = false;
+  isDropDownOpenForRegion.value = false;
 }
 
 function cityDropDown(){
   showListCity.value = true;
   showListCountry.value = false;
+  isDropDownOpenForRegion.value = false;
 }
 </script>
 
