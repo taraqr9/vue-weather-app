@@ -477,7 +477,7 @@ function cityDropDown(){
 
 <template>
   <title>Weather App</title>
-
+<!--comment-->
   <div class="h-screen flex items-center justify-center bg-gray-400">
     <div
       class="max-w-sm w-1/3 mx-auto p-8 bg-white rounded-xl shadow-2xl h-full"
