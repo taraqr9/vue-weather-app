@@ -375,6 +375,7 @@ async function getCities(city = "") {
     } else {
       cities.value[0] = { name: "No match found!" };
       cities.value = cities.value.slice(0, 1);
+      weatherDetails.value = "";
     }
   } catch (error) {}
 }
