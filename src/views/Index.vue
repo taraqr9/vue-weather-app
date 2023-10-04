@@ -229,7 +229,12 @@ const loadingIconForRegion = ref(false);
 const loadingIconForDetailsAndPlaces = ref(false);
 
 const filteredCountries = computed(() => {
-  return countries.filter((country) => !searchCountry.value || country.toLowerCase().includes(searchCountry.value.toLowerCase()));
+  const filteredCountries = countries.filter((country) => !searchCountry.value || country.toLowerCase().includes(searchCountry.value.toLowerCase()));
+  if(filteredCountries.length === 0 && country.value){
+    clearValuesForRegion();
+  }
+
+  return filteredCountries;
 });
 
 const onCitySearch = async () => {
@@ -243,6 +248,7 @@ const filteredCities = computed(() => cities.value);
 function selectCountry(country) {
   searchCountry.value = country;
   clearValuesForRegion();
+  showListCountry.value = false;
 
   getCountry(urlCountry + country);
 }
@@ -360,6 +366,9 @@ async function getCities(city='') {
           resolve();
         }, 1200);
       });
+    }else{
+      cities.value[0] = {name: 'No match found!'};
+      cities.value = cities.value.slice(0,1);
     }
   } catch (error) {
   }
@@ -426,9 +435,7 @@ function toggledWeatherOrPlaceNearLocation(value) {
 }
 
 function clearValuesForRegion() {
-  showListCountry.value = false;
   cityDetails.value = '';
-  isDropDownOpenForCities.value = false;
   weatherDetails.value = '';
   cities.value = '';
   regions.value = '';
@@ -480,7 +487,7 @@ function clearValuesForWeather() {
                class="absolute left-0 mt-2 w-60 rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
             <ul
                 aria-labelledby="dropdownSearchButton">
-              <li class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
+              <li  v-show="searchCountry.length > 0 && showListCountry" class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
                   v-for="country in filteredCountries"
                   :key="country">
                 <input
@@ -488,6 +495,15 @@ function clearValuesForWeather() {
                     id="checkbox-item-11"
                     readonly
                     :value="country"
+                    class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
+                />
+              </li>
+
+              <li  v-if="showListCountry && filteredCountries.length===0" class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl">
+                <input
+                    id="checkbox-item-11"
+                    readonly
+                    value="No match found!"
                     class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
                 />
               </li>
