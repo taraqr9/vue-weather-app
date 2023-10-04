@@ -4,7 +4,8 @@
 <template>
   <title>Weather App</title>
 
-  <div class="h-screen flex items-center justify-center bg-gray-400">
+  <div class="h-screen mx-auto bg-gray-400">
+
     <div class="w-1/4 mx-auto p-8 bg-white rounded-xl shadow-2xl h-full">
       <h3 class="text-center mx-auto w-2/3 text-xl mb-2 bg-green-400 rounded-full p-2 text-white">Weather App</h3>
       <img
@@ -20,7 +21,7 @@
             placeholder="Search Country"
         />
 
-        <div class="mt-2 w-60 rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-10 focus:outline-none z-50">
+        <div class="mt-2 w-60 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-10 focus:outline-none z-50">
           <ul class="overflow-y-auto max-h-40 scroll-smooth focus:scroll-auto" aria-labelledby="dropdownSearchButton">
             <li class="flex items-center pl-4 hover:bg-sky-100 rounded-2xl">
               <input readonly value="country 1" class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
@@ -73,8 +74,8 @@
           </ul>
         </div>
       </div>
-
     </div>
+
   </div>
 
 </template>
