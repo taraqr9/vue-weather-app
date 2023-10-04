@@ -230,7 +230,7 @@ const loadingIconForDetailsAndPlaces = ref(false);
 
 const filteredCountries = computed(() => {
   const filteredCountries = countries.filter((country) => !searchCountry.value || country.toLowerCase().includes(searchCountry.value.toLowerCase()));
-  if(filteredCountries.length === 0 && country.value){
+  if (filteredCountries.length === 0 && country.value) {
     clearValuesForRegion();
   }
 
@@ -341,7 +341,7 @@ async function getCountry(url) {
 
 }
 
-async function getCities(city='') {
+async function getCities(city = '') {
   const options = {
     method: 'GET',
     url: `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${regionDetails.value.countryCode}/regions/${regionDetails.value.isoCode}/cities`,
@@ -358,7 +358,7 @@ async function getCities(city='') {
 
   try {
     const res = await axios.request(options);
-    if(res.data.data.length>0){
+    if (res.data.data.length > 0) {
       cities.value = res.data.data;
 
       await new Promise((resolve) => {
@@ -366,9 +366,9 @@ async function getCities(city='') {
           resolve();
         }, 1200);
       });
-    }else{
+    } else {
       cities.value[0] = {name: 'No match found!'};
-      cities.value = cities.value.slice(0,1);
+      cities.value = cities.value.slice(0, 1);
     }
   } catch (error) {
   }
@@ -469,11 +469,10 @@ function clearValuesForWeather() {
           src="../assets/weather.svg"
           alt="Weather"
       />
-
       <div class="text-center mt-8">
       </div>
 
-      <div>
+      <div v-if="!loadingIconForRegion && !loadingIconForCity && !loadingIconForDetailsAndPlaces">
         <div class="relative">
           <input
               type="text"
@@ -487,7 +486,8 @@ function clearValuesForWeather() {
                class="absolute left-0 mt-2 w-60 rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
             <ul
                 aria-labelledby="dropdownSearchButton">
-              <li  v-show="searchCountry.length > 0 && showListCountry" class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
+              <li v-show="searchCountry.length > 0 && showListCountry"
+                  class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
                   v-for="country in filteredCountries"
                   :key="country">
                 <input
@@ -499,7 +499,8 @@ function clearValuesForWeather() {
                 />
               </li>
 
-              <li  v-if="showListCountry && filteredCountries.length===0" class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl">
+              <li v-if="showListCountry && filteredCountries.length===0"
+                  class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl">
                 <input
                     id="checkbox-item-11"
                     readonly
@@ -510,106 +511,99 @@ function clearValuesForWeather() {
             </ul>
           </div>
         </div>
-      </div>
 
-      <div v-if="loadingIconForRegion">
-        <LoadingAnimation/>
-      </div>
+        <div v-if="regions && regions.length>0">
+          <div class="relative mt-10">
+            <div>
+              <button @click="toggledDropDownForRegion" type="button"
+                      class="inline-flex w-full p-2 pl-10 gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                      id="menu-button" aria-expanded="true" aria-haspopup="true">
+                {{ regionDetails ? regionDetails.name : "Select Regions" }}
+                <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd"
+                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                        clip-rule="evenodd"/>
+                </svg>
+              </button>
+            </div>
 
-      <div v-if="regions && regions.length>0">
-        <div class="relative mt-10">
-          <div>
-            <button @click="toggledDropDownForRegion" type="button"
-                    class="inline-flex w-full p-2 pl-10 gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                    id="menu-button" aria-expanded="true" aria-haspopup="true">
-              {{ regionDetails ? regionDetails.name : "Select Regions" }}
-              <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd"
-                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                      clip-rule="evenodd"/>
-              </svg>
-            </button>
-          </div>
-
-          <ul v-if="isDropDownOpenForRegion"
-              class="absolute mt-2 w-60 origin-top-right rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40">
-            <li v-for="region in regions" :key="region" @click="selectRegion(region)"
-                class="text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-sky-100 rounded-2xl"
-                role="menuitem" id="menu-item-0">
-              {{ region.name }}
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div v-if="loadingIconForCity">
-        <LoadingAnimation/>
-      </div>
-
-      <div v-if="cities && cities.length > 0 && loadingIconForCity === false">
-        <div class="relative mt-10">
-          <input
-              type="text"
-              id="input-group-search"
-              class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Search City"
-              v-model="searchCity"
-              @input="onCitySearch"
-              @focus="showListCity = true"
-          />
-          <div
-              v-show="searchCity && showListCity"
-              class="absolute left-0 mt-2 w-60  rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-30"
-          >
-            <ul aria-labelledby="dropdownSearchButton">
-              <li
-                  class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
-                  v-for="city in filteredCities"
-                  :key="city"
-              >
-                <input
-                    @click="selectCity(city)"
-                    id="checkbox-item-11"
-                    readonly
-                    :value="city.name"
-                    class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
-                />
+            <ul v-if="isDropDownOpenForRegion"
+                class="absolute mt-2 w-60 origin-top-right rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40">
+              <li v-for="region in regions" :key="region" @click="selectRegion(region)"
+                  class="text-gray-700 block px-4 py-2 text-sm cursor-pointer hover:bg-sky-100 rounded-2xl"
+                  role="menuitem" id="menu-item-0">
+                {{ region.name }}
               </li>
             </ul>
           </div>
         </div>
-      </div>
 
-      <div v-if="loadingIconForDetailsAndPlaces">
-        <div role="status" class="h-96 flex items-center justify-center">
-          <LoadingAnimation/>
+
+        <div v-if="cities && cities.length > 0 && loadingIconForCity === false">
+          <div class="relative mt-10">
+            <input
+                type="text"
+                id="input-group-search"
+                class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Search City"
+                v-model="searchCity"
+                @input="onCitySearch"
+                @focus="showListCity = true"
+            />
+            <div
+                v-show="searchCity && showListCity"
+                class="absolute left-0 mt-2 w-60  rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-30"
+            >
+              <ul aria-labelledby="dropdownSearchButton">
+                <li
+                    class="flex items-center pl-4 overflow-y-auto hover:bg-sky-100 rounded-2xl"
+                    v-for="city in filteredCities"
+                    :key="city"
+                >
+                  <input
+                      @click="selectCity(city)"
+                      id="checkbox-item-11"
+                      readonly
+                      :value="city.name"
+                      class="w-full py-2 text-sm font-medium hover:bg-sky-100 text-black cursor-pointer rounded-xl"
+                  />
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="weatherDetails" class="relative mt-4">
+          <div class="flex items-center justify-between">
+            <button @click="toggledWeatherOrPlaceNearLocation(true)"
+                    class="btn-green">
+              Weather Details
+            </button>
+            <button @click="toggledWeatherOrPlaceNearLocation(false)"
+                    class="btn-green">
+              Places Near
+            </button>
+          </div>
+
+          <div v-if="toggledWeatherOrPlaceNear">
+            <WeatherDetails
+                :weatherDetails="weatherDetails"
+            />
+          </div>
+          <div v-if="!toggledWeatherOrPlaceNear">
+            <PlacesNearLocation
+                :placesNearLocation="placesNearLocation"
+            />
+          </div>
+
         </div>
       </div>
-
-      <div v-if="weatherDetails" class="relative mt-4">
-        <div class="flex items-center justify-between">
-          <button @click="toggledWeatherOrPlaceNearLocation(true)"
-                  class="btn-green">
-            Weather Details
-          </button>
-          <button @click="toggledWeatherOrPlaceNearLocation(false)"
-                  class="btn-green">
-            Places Near
-          </button>
-        </div>
-
-        <div v-if="toggledWeatherOrPlaceNear">
-          <WeatherDetails
-              :weatherDetails="weatherDetails"
-          />
-        </div>
-        <div v-if="!toggledWeatherOrPlaceNear">
-          <PlacesNearLocation
-              :placesNearLocation="placesNearLocation"
-          />
-        </div>
-
+      <div class="relative" v-if="loadingIconForRegion || loadingIconForCity || loadingIconForDetailsAndPlaces">
+        <LoadingAnimation/>
       </div>
+
     </div>
+
+
   </div>
 </template>
